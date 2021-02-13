@@ -1,1 +1,14 @@
-<p>chat works!</p>
+<div class="conteiner">
+
+    <div class="chat">
+        <span *ngFor="let message of messages">
+            {{message.userName}}: {{message.message}}
+        </span>
+    </div>
+    <div class="input">
+        <textarea class="input-raw" #data ></textarea>
+        <button mat-button (click)="send(data.value)">
+            <span>Send</span>
+        </button>
+    </div>
+</div>

@@ -1,8 +1,9 @@
 export interface StreamDto {
-    StreamId: number,
-    OwnerId: number,
-    StreamName: string,
-    Live: boolean,
-    Title: string,
-    Description: string
+    streamId: number,
+    ownerId: number,
+    streamName: string,
+    live: boolean,
+    title: string,
+    description: string,
+    chatId: number
 }

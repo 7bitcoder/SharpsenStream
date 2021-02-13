@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StreamDto } from './StreamDto';
+import { StreamDto } from '../StreamDto';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({

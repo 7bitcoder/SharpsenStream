@@ -21,5 +21,6 @@ CREATE TABLE Stream (
 	StreamName varchar(256),
 	Live bit,
 	Title varchar(256),
-	Description varchar(512),
+	Description varchar(256),
+	ChatId int
 );

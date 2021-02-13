@@ -1,5 +1,6 @@
 ﻿using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Database;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
@@ -11,6 +12,11 @@ namespace SharpsenStreamBackend.Resources
         public StreamResource(DbController dbController)
         {
             this._dbController = dbController;
+        }
+
+        public Task<IEnumerable<ChatRoomId>> getChatRooms()
+        {
+            return _dbController.QuerryList<ChatRoomId>("dbo.GetChatRooms", new SqlParameters());
         }
 
         public async Task<StreamDto> getStream(string streamName)

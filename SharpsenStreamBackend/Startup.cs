@@ -6,13 +6,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SharpsenStreamBackend.Database;
 using SharpsenStreamBackend.Resources;
+using SharpsenStreamBackend.StreamChat;
 using System.Threading.Tasks;
 
 namespace SharpsenStreamBackend
 {
     public class Startup
     {
-        private SocketServer.SocketServer server = SocketServer.SocketServer.getSocketServer(); // singeleton
+        StreamChatServer _chatServer;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -39,11 +40,14 @@ namespace SharpsenStreamBackend
             });
             services.AddSingleton<DbController>();
             services.AddSingleton<IStreamResource, StreamResource>();
+            services.AddSingleton<ChatRooms>();
+            services.AddSingleton<StreamChatServer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            _chatServer = app.ApplicationServices.GetService<StreamChatServer>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -66,7 +70,7 @@ namespace SharpsenStreamBackend
                     {
                         var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                         var socketFinishedTcs = new TaskCompletionSource<object>();
-                        //server.handleUser(webSocket, socketFinishedTcs);
+                        _chatServer.handleUser(webSocket, socketFinishedTcs);
                         await socketFinishedTcs.Task;
                     }
                     else

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router} from '@angular/router';
 import { RouteNames } from 'src/app/route-names';
-import { StreamService } from './stream.service';
+import { StreamService } from './services/stream.service';
+import { StreamDto } from './StreamDto';
+import { InitializeService } from './services/initialize.service';
 
 @Component({
   selector: 'app-stream',
@@ -10,11 +12,13 @@ import { StreamService } from './stream.service';
 })
 export class StreamComponent implements OnInit {
 
+  streamInfo: StreamDto;
   streamName: string;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private stream$: StreamService) { 
+    private stream$: StreamService,
+    private initializatior: InitializeService) { 
     const url = this.route.snapshot.url;
     if (url.length !== 1) {
       this.router.navigate([RouteNames.notFound]);
@@ -26,7 +30,11 @@ export class StreamComponent implements OnInit {
   async getStream(name: string) {
     this.stream$.getStream(name).subscribe(
       {
-        next : res => console.log(res)
+        next : res => {
+          this.streamInfo = res
+          debugger;
+          this.initializatior.initializeChat(this.streamInfo.chatId);
+        }
       }
     );
   }
