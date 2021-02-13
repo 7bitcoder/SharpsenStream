@@ -1,0 +1,21 @@
+<mat-dialog-content>
+    <h2>Login</h2>
+    <mat-form-field color="accent" appearance="standard">
+        <mat-label>Username</mat-label>
+        <input matInput type="text" #username name="username" required />
+    </mat-form-field>
+    <mat-form-field color="accent" appearance="standard">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" #password name="username" required />
+    </mat-form-field>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+    <div class="actions">
+        <button mat-button (click)="finish(false)">Cancel</button>
+        <span class="example-spacer"></span>
+        <button mat-button class="end" (click)="createAccount()">Create Account</button>
+        <button mat-button class="end" (click)="signIn(username.value, password.value)">Sign In</button>
+    </div>
+
+</mat-dialog-actions>
