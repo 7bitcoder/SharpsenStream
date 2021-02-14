@@ -1,6 +1,9 @@
-<div class="container" *ngIf="streamInfo">
+<div class="container">
     <div class="mainContent">
-
+      <video class="player" id="videoElement"></video>
+      <button mat-button (click)="play()">
+        <span>Play</span>
+    </button>
     </div>
     <div class="chat">
         <app-chat></app-chat>

@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router} from '@angular/router';
 import { RouteNames } from 'src/app/route-names';
 import { StreamService } from './services/stream.service';
 import { StreamDto } from './StreamDto';
 import { InitializeService } from './services/initialize.service';
+import 'flv.js';
+import FlvJs from 'flv.js';
 
 @Component({
   selector: 'app-stream',
@@ -12,6 +14,7 @@ import { InitializeService } from './services/initialize.service';
 })
 export class StreamComponent implements OnInit {
 
+  @ViewChildren('videoElement') videoElement: ElementRef;
   streamInfo: StreamDto;
   streamName: string;
   constructor(
@@ -27,6 +30,11 @@ export class StreamComponent implements OnInit {
     this.getStream(streamName);
     
   }
+
+  ngOnInit(){
+
+  }
+  
   async getStream(name: string) {
     this.stream$.getStream(name).subscribe(
       {
@@ -42,7 +50,19 @@ export class StreamComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
+  play(): void {
+    if (FlvJs.isSupported()) {
+      const videoElement = document.getElementById('videoElement') as HTMLMediaElement;
+      const flvPlayer = FlvJs.createPlayer({
+        type: 'flv',
+        "isLive": true,
+        url: 'http://localhost:8000/live/new.flv'
+      });
+      flvPlayer.attachMediaElement(videoElement);
+      flvPlayer.load();
+      flvPlayer.play();
+    }
+
   }
 
 }
