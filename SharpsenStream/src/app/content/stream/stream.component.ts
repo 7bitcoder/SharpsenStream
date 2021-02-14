@@ -32,7 +32,10 @@ export class StreamComponent implements OnInit {
       {
         next : res => {
           this.streamInfo = res
-          debugger;
+          if (!res) {
+            this.router.navigate([RouteNames.notFound]);
+            return;
+          }
           this.initializatior.initializeChat(this.streamInfo.chatId);
         }
       }

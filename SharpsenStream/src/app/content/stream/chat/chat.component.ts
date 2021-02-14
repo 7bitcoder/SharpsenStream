@@ -45,7 +45,6 @@ export class ChatComponent implements OnInit {
   }
 
   updateChat(message: Message) {
-    debugger;
     this.messages.push(message);
   }
 }

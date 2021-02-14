@@ -28,7 +28,6 @@ export class ChatService {
   }
 
   sendData(data: Message) {
-    debugger;
     this.socket$.next( data );
   }
 
