@@ -4,8 +4,6 @@ import { RouteNames } from 'src/app/route-names';
 import { StreamService } from './services/stream.service';
 import { StreamDto } from './StreamDto';
 import { InitializeService } from './services/initialize.service';
-import 'flv.js';
-import FlvJs from 'flv.js';
 
 @Component({
   selector: 'app-stream',
@@ -48,21 +46,6 @@ export class StreamComponent implements OnInit {
         }
       }
     );
-  }
-
-  play(): void {
-    if (FlvJs.isSupported()) {
-      const videoElement = document.getElementById('videoElement') as HTMLMediaElement;
-      const flvPlayer = FlvJs.createPlayer({
-        type: 'flv',
-        "isLive": true,
-        url: 'http://localhost:8000/live/new.flv'
-      });
-      flvPlayer.attachMediaElement(videoElement);
-      flvPlayer.load();
-      flvPlayer.play();
-    }
-
   }
 
 }

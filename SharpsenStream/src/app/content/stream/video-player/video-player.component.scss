@@ -1,0 +1,11 @@
+:host {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+.video {
+    background-color: black;
+    &-player {
+        width: 100%;
+    }
+}

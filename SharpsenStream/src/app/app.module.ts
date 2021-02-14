@@ -21,6 +21,7 @@ import { ContentComponent } from './content/content.component';
 import { StreamComponent } from './content/stream/stream.component';
 import { PageNotFoundComponent } from './content/page-not-found/page-not-found.component';
 import { HttpClientModule } from '@angular/common/http';
+import { VideoPlayerComponent } from './content/stream/video-player/video-player.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { HttpClientModule } from '@angular/common/http';
     ChatComponent,
     ContentComponent,
     StreamComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    VideoPlayerComponent
   ],
   imports: [
     BrowserModule,

@@ -97,5 +97,24 @@ namespace SharpsenStreamBackend.Database
             }
             return list;
         }
+
+        public async Task<IEnumerable<T>> Execute<T>(string procedure, SqlParameters parameters, Func<T> function)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionStr))
+            {
+                SqlCommand command = new SqlCommand(procedure, connection);
+                command.CommandType = CommandType.StoredProcedure;
+
+                command.Connection.Open();
+                foreach (var parameter in parameters)
+                {
+                    command.Parameters.Add(parameter);
+                }
+
+                SqlDataReader dr = await command.ExecuteReaderAsync(CommandBehavior.Default);
+                var list = Convert<T>(dr);
+                return list;
+            }
+        }
     }
 }
