@@ -43,6 +43,7 @@ export class StreamComponent implements OnInit {
             return;
           }
           this.initializatior.initializeChat(this.streamInfo.chatId);
+          this.initializatior.initializeViewer(this.streamInfo.streamName);
         }
       }
     );

@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import FlvJs from 'flv.js';
+import { InitializeService } from '../services/initialize.service';
 
 @Component({
   selector: 'app-video-player',
@@ -9,22 +10,25 @@ import FlvJs from 'flv.js';
 export class VideoPlayerComponent implements AfterViewInit {
 
   flvPlayer: FlvJs.Player
-  constructor() { }
+  constructor(private initializeService: InitializeService) { }
 
   ngOnInit(): void {
   }
 
   ngAfterViewInit(): void {
-    if (FlvJs.isSupported()) {
-      const videoElement = document.getElementById('videoElement') as HTMLMediaElement;
-      this.flvPlayer = FlvJs.createPlayer({
-        type: 'flv',
-        "isLive": true,
-        url: 'http://localhost:8000/live/new.flv'
-      });
-      this.flvPlayer.attachMediaElement(videoElement);
-      this.flvPlayer.load();
-    }
+    this.initializeService.getViewerObservable().subscribe( ( streamUrl ) => {
+      debugger;
+      if (FlvJs.isSupported()) {
+        const videoElement = document.getElementById('videoElement') as HTMLMediaElement;
+        this.flvPlayer = FlvJs.createPlayer({
+          type: 'flv',
+          "isLive": true,
+          url: streamUrl
+        });
+        this.flvPlayer.attachMediaElement(videoElement);
+        this.flvPlayer.load();
+      }
+    });
   }
 
   play(): void {

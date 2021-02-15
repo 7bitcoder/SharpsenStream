@@ -24,7 +24,7 @@ namespace SharpsenStreamBackend.Controllers
         }
 
         // when user wants to initialize stream this endpoint authenticates this proces
-        [HttpPost("{streamName}/authenticate")]
+        [HttpPost("authenticate/{streamName}")]
         public async Task<IActionResult> authenticateStream([FromRoute] string streamName, [FromBody] TokenDto token)
         {
             var ok = await _streamResource.authenticate(streamName, token.token);

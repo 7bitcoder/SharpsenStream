@@ -13,7 +13,8 @@ const config = {
   http: {
     port: 8000,
     allow_origin: '*'
-  }
+  },
+  apiUrl: 'https://localhost:5001/Stream/authenticate'
 };
 
 var nms = new NodeMediaServer(config)
@@ -21,29 +22,32 @@ nms.run();
 
 // npm install node-fetch
 nms.on('prePublish', async (id, StreamPath, args) => {
+	debugger;
   try {
-	tokenDto = {
-		token: args.token
-	}
-	const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    });
 	const streamName = StreamPath.replace(/^\/live\//, '');
-    const response = await fetch(`https://localhost:5001/Stream/${streamName}/authenticate`,
+    const response = await authenticate(streamName, args.token);
+	if (response.status !== 200)
+		throw new Exception();
+  } catch (error) {
+	const session = nms.getSession(id);
+	session.reject();
+  }
+});
+
+function authenticate(streamName, token) {
+	return fetch( `${config.apiUrl}/${streamName}`,
 	{
+		mode: 'no-cors',
+		method: 'POST', 
 		headers: {
 			'Accept': 'application/json, text/plain',
 			'Content-Type': 'application/json;charset=UTF-8'
 		},
-		mode: 'no-cors',
-		method: 'POST', 
-		body: JSON.stringify(tokenDto),
-		agent: httpsAgent
+		body: JSON.stringify({
+			token: token
+		}),
+		agent: new https.Agent({
+			rejectUnauthorized: false,
+		})
 	});
-	if (response.status !== 200)
-		throw new Exception();
-  } catch (error) {
-	let session = nms.getSession(id);
-	session.reject();
-  }
-});
+}
