@@ -35,4 +35,11 @@ export class VideoPlayerComponent implements AfterViewInit {
     this.flvPlayer.pause();
   }
 
+  showControlls() {
+
+  }
+
+  hideControlls() {
+
+  }
 }

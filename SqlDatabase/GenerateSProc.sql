@@ -14,3 +14,16 @@ AS
 BEGIN
 	SELECT ChatId FROM Stream;
 END
+
+
+GO
+CREATE PROCEDURE AuthenticateStreamInit @StreamName varchar(256), @Token varchar(512)
+AS
+IF EXISTS (SELECT Token FROM Stream WHERE StreamName = @StreamName AND Token = @Token)
+BEGIN
+   RETURN 1 
+END
+ELSE
+BEGIN
+    RETURN 0
+END
