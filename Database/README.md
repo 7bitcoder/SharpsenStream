@@ -2,4 +2,4 @@
 
 ## Microsoft SQL Server is used in this project
 
-execute two query files to generate tables and stored procedures
+execute two query files to generate database, tables and stored procedures
