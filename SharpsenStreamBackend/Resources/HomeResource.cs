@@ -1,4 +1,5 @@
-﻿using SharpsenStreamBackend.Database;
+﻿using Dapper;
+using SharpsenStreamBackend.Database;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
@@ -16,9 +17,9 @@ namespace SharpsenStreamBackend.Resources
 
         public async Task<bool> authenticate(string streamName, string token)
         {
-            var parameters = new SqlParameters();
-            parameters.Add("@StreamName", SqlDbType.VarChar, streamName, 256);
-            parameters.Add("@Token", SqlDbType.VarChar, token, 512);
+            var parameters = new DynamicParameters();
+            parameters.Add("@StreamName", streamName, DbType.String);
+            parameters.Add("@Token", token, DbType.String);
             var res = await _dbController.Querry("dbo.AuthenticateStreamInit", parameters);
             return res == 1;
         }
@@ -28,9 +29,9 @@ namespace SharpsenStreamBackend.Resources
             string hash;
             using (SHA256 sha256Hash = SHA256.Create())
                 hash = GetHash(sha256Hash, password);
-            var parameters = new SqlParameters();
-            parameters.Add("@Username", SqlDbType.VarChar, userName, 256);
-            parameters.Add("@PasswordHash", SqlDbType.VarChar, hash, 256);
+            var parameters = new DynamicParameters();
+            parameters.Add("@Username", userName, DbType.String);
+            parameters.Add("@PasswordHash", hash, DbType.String);
             var res = await _dbController.Querry("dbo.Login", parameters);
             return res == 1;
         }

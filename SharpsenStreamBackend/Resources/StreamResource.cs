@@ -1,4 +1,5 @@
-﻿using SharpsenStreamBackend.Classes.Dto;
+﻿using Dapper;
+using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Database;
 using System.Collections.Generic;
 using System.Data;
@@ -16,13 +17,13 @@ namespace SharpsenStreamBackend.Resources
 
         public Task<IEnumerable<ChatRoomId>> getChatRooms()
         {
-            return _dbController.QuerryList<ChatRoomId>("dbo.GetChatRooms", new SqlParameters());
+            return _dbController.QuerryList<ChatRoomId>("dbo.GetChatRooms", new DynamicParameters());
         }
 
         public async Task<StreamDto> getStream(string streamName)
         {
-            var parameters = new SqlParameters();
-            parameters.Add("@StreamName", SqlDbType.VarChar, streamName, 256);
+            var parameters = new DynamicParameters();
+            parameters.Add("@StreamName", streamName, DbType.String);
             var res = await _dbController.Querry<StreamDto>("dbo.GetStream", parameters);
             return res;
         }
