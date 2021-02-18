@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,6 +44,17 @@ namespace SharpsenStreamBackend
             services.AddSingleton<IStreamResource, StreamResource>();
             services.AddSingleton<ChatRooms>();
             services.AddSingleton<StreamChatServer>();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+              .AddCookie(options =>
+              {
+                  options.Cookie.HttpOnly = true;
+                  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                  options.Cookie.SameSite = SameSiteMode.Lax;
+                  options.Cookie.Name = "SimpleTalk.AuthCookieAspNetCore";
+                  options.LoginPath = "/Home/Login";
+                  options.LogoutPath = "/Home/Logout";
+              });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +74,10 @@ namespace SharpsenStreamBackend
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCookiePolicy();
+
+            app.UseAuthentication();
 
             app.Use(async (context, next) =>
             {

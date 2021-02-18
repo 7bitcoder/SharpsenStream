@@ -27,3 +27,15 @@ ELSE
 BEGIN
     RETURN 0
 END
+
+GO
+CREATE PROCEDURE Login @Username varchar(256), @PasswordHash varchar(256)
+AS
+IF EXISTS (SELECT Username, UserPassword FROM Users WHERE Username = @Username AND UserPassword = @PasswordHash)
+BEGIN
+   RETURN 1 
+END
+ELSE
+BEGIN
+    RETURN 0
+END
