@@ -24,8 +24,12 @@ export class ChatComponent implements OnInit {
     );
   }
 
-  send(message: string) {
-    this.chat$.sendData({message: message, userName: 'me'});
+  send(textinput: HTMLTextAreaElement) {
+    debugger;
+    if (textinput.value) {
+      this.chat$.sendData({message: textinput.value, userName: 'me', color:1});
+      textinput.value = "";
+    }
   }
 
   initializeChat(chatId: number) {
@@ -33,8 +37,9 @@ export class ChatComponent implements OnInit {
       return;
     this.chat$.connect();
     const msg: Message = {
-      message: chatId.toString(),
-      userName: 'me'
+      message: `${chatId.toString()};1`,
+      userName: 'me',
+      color: 1
     }
     this.chat$.sendData(msg);
     this.chat$.getObservable().subscribe(
@@ -45,6 +50,16 @@ export class ChatComponent implements OnInit {
   }
 
   updateChat(message: Message) {
+    message.color = this.toColor(message.color);
     this.messages.push(message);
+  }
+ 
+  toColor(num) {
+      num >>>= 0;
+      var b = num & 0xFF,
+          g = (num & 0xFF00) >>> 8,
+          r = (num & 0xFF0000) >>> 16,
+          a = ( (num & 0xFF000000) >>> 24 ) / 255 ;
+      return "rgba(" + [r, g, b, a].join(",") + ")";
   }
 }

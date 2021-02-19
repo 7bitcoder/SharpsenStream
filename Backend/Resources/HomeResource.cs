@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Database;
 using System.Data;
 using System.Security.Cryptography;
@@ -24,7 +25,7 @@ namespace SharpsenStreamBackend.Resources
             return res == 1;
         }
 
-        public async Task<bool> Login(string userName, string password)
+        public Task<User> Login(string userName, string password)
         {
             string hash;
             using (SHA256 sha256Hash = SHA256.Create())
@@ -32,8 +33,7 @@ namespace SharpsenStreamBackend.Resources
             var parameters = new DynamicParameters();
             parameters.Add("@Username", userName, DbType.String);
             parameters.Add("@PasswordHash", hash, DbType.String);
-            var res = await _dbController.Querry("dbo.Login", parameters);
-            return res == 1;
+            return _dbController.Querry<User>("dbo.Login", parameters);
         }
 
         public Task<bool> logOut(int userId)

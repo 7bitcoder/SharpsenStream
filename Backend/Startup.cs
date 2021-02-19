@@ -30,6 +30,7 @@ namespace SharpsenStreamBackend
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SharpsenStreamBackend", Version = "v1" });
             });
+            services.AddSwaggerDocument();
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -41,6 +42,7 @@ namespace SharpsenStreamBackend
             services.AddSingleton<DbController>();
             services.AddSingleton<IStreamResource, StreamResource>();
             services.AddSingleton<IHomeResource, HomeResource>();
+            services.AddSingleton<IUserResource, UserResource>();
             services.AddSingleton<ChatRooms>();
             services.AddSingleton<StreamChatServer>();
             /*services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -62,7 +64,6 @@ namespace SharpsenStreamBackend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SharpsenStreamBackend v1"));
             }
             app.UseWebSockets();
@@ -71,7 +72,7 @@ namespace SharpsenStreamBackend
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            // app.UseAuthorization();
 
             //app.UseCookiePolicy();
 

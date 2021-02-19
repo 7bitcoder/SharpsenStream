@@ -1,14 +1,19 @@
 <div class="conteiner">
 
     <div class="chat">
-        <span *ngFor="let message of messages">
-            {{message.userName}}: {{message.message}}
+        <span *ngFor="let message of messages" class="message">
+            <div [style.color]="message.color">
+                {{message.userName}}:
+            </div> &nbsp;{{message.message}}
         </span>
     </div>
     <div class="input">
-        <textarea class="input-raw" #data ></textarea>
-        <button mat-button (click)="send(data.value)">
-            <span>Send</span>
-        </button>
+        <textarea class="input-raw" (keydown.enter)="send(data)" #data ></textarea>
+        <div class="controls">
+            <div class="spacer"></div>
+            <button mat-icon-button (click)="send(data)">
+                <mat-icon svgIcon="SendMessage"></mat-icon>
+            </button>
+        </div>
     </div>
 </div>

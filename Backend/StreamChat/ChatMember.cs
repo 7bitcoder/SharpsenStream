@@ -1,6 +1,6 @@
 ﻿using SharpsenStreamBackend.Classes;
+using SharpsenStreamBackend.Classes.Dto;
 using System;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,16 +11,18 @@ namespace SharpsenStreamBackend.StreamChat
     public class ChatMember
     {
         static int cnt = 0;
-        string userName;
+        User data;
 
         WebSocketHandler _socketHandler;
         public ChatMember(WebSocket socket)
         {
             cnt++;
-            userName = String.Concat(Enumerable.Repeat(cnt.ToString(), 8));
             _socketHandler = new WebSocketHandler(socket);
         }
-
+        public void init(User user)
+        {
+            this.data = user;
+        }
         public void sendMessage(Message message)
         {
             var rawMessage = JsonSerializer.Serialize(message);
@@ -35,7 +37,8 @@ namespace SharpsenStreamBackend.StreamChat
                 throw new UserDisconnected();
             }
             var message = JsonSerializer.Deserialize<Message>(data.data);
-            message.userName = userName;
+            message.userName = this.data?.Username;
+            message.color = this.data?.Color ?? 0;
             return message;
         }
     }

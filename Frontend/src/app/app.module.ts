@@ -22,7 +22,11 @@ import { StreamComponent } from './content/stream/stream.component';
 import { PageNotFoundComponent } from './content/page-not-found/page-not-found.component';
 import { HttpClientModule } from '@angular/common/http';
 import { VideoPlayerComponent } from './content/stream/video-player/video-player.component';
+import { API_BASE_URL } from './api/Api';
 
+export function getBaseUrl(): string {
+  return '/api';
+}
 @NgModule({
   declarations: [
     AppComponent,
@@ -50,7 +54,7 @@ import { VideoPlayerComponent } from './content/stream/video-player/video-player
     MatFormFieldModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [{ provide: API_BASE_URL, useFactory: getBaseUrl }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

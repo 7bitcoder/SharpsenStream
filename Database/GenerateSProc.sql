@@ -31,11 +31,21 @@ END
 GO
 CREATE PROCEDURE Login @Username varchar(256), @PasswordHash varchar(256)
 AS
-IF EXISTS (SELECT Username, UserPassword FROM Users WHERE Username = @Username AND UserPassword = @PasswordHash)
+declare @Id int = NULL
+SELECT @Id = (SELECT TOP 1 USerId FROM Users WHERE Username = @Username AND UserPassword = @PasswordHash)
+IF (@Id is null)
 BEGIN
-   RETURN 1 
+	Select null
 END
 ELSE
 BEGIN
-    RETURN 0
+   EXEC dbo.GetUser @Id
+END
+
+GO
+CREATE PROCEDURE GetUser @Id int
+AS
+BEGIN
+   SELECT TOP 1 UserId, Username, Email, AvatarFilePath, Color FROM Users
+		WHERE UserId = @Id
 END

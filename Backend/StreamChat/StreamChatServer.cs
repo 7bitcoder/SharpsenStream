@@ -1,5 +1,6 @@
 ﻿
 
+using SharpsenStreamBackend.Resources;
 using System;
 using System.Net.WebSockets;
 using System.Threading;
@@ -10,23 +11,24 @@ namespace SharpsenStreamBackend.StreamChat
     public class StreamChatServer
     {
         ChatRooms _chatRooms;
-        public StreamChatServer(ChatRooms chatRooms)
+        IUserResource _userResource;
+        public StreamChatServer(ChatRooms chatRooms, IUserResource userResource)
         {
             _chatRooms = chatRooms;
+            _userResource = userResource;
         }
         public async void handleUser(WebSocket webSocket, TaskCompletionSource<object> end)
         {
             try
             {
                 var user = new ChatMember(webSocket);
-                var chatId = await waitForChatId(user);
-                await _chatRooms.handleUser(user, chatId);
+                var data = await waitForData(user);
+                var userData = await _userResource.getUser(data.userId);
+                user.init(userData);
+                await _chatRooms.handleUser(user, data.chatId);
 
             }
-            catch (Exception e)
-            {
-
-            }
+            catch (Exception) { }
             finally
             {
                 await webSocket.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None);
@@ -34,11 +36,13 @@ namespace SharpsenStreamBackend.StreamChat
             }
         }
 
-        private async Task<int> waitForChatId(ChatMember member)
+        private async Task<(int chatId, int userId)> waitForData(ChatMember member)
         {
             var message = await member.getMessage();
-            int chatId = Int32.Parse(message.message);
-            return chatId;
+            var id = message.message.Split(";");
+            int chatId = Int32.Parse(id[0]);
+            int userId = Int32.Parse(id[1]);
+            return (chatId, userId);
         }
     }
 }

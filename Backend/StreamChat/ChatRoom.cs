@@ -1,4 +1,5 @@
 ﻿using SharpsenStreamBackend.Classes;
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -56,7 +57,7 @@ namespace SharpsenStreamBackend.StreamChat
                     _chatMessages.Add(message);
                 }
             }
-            catch (UserDisconnected e)
+            catch (Exception)
             {
 
             }

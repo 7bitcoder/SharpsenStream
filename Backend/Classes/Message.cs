@@ -4,5 +4,6 @@
     {
         public string userName { get; set; }
         public string message { get; set; }
+        public int color { get; set; }
     }
 }

@@ -7,6 +7,7 @@ CREATE TABLE Users (
     UserPassword varchar(256),
     Email varchar(256),
     AvatarFilePath varchar(256),
+	Color int
 );
 
 CREATE TABLE Perms (

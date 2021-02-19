@@ -16,19 +16,7 @@ export class VideoPlayerComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.initializeService.getViewerObservable().subscribe( ( streamUrl ) => {
-      debugger;
-      if (FlvJs.isSupported()) {
-        const videoElement = document.getElementById('videoElement') as HTMLMediaElement;
-        this.flvPlayer = FlvJs.createPlayer({
-          type: 'flv',
-          "isLive": true,
-          url: streamUrl
-        });
-        this.flvPlayer.attachMediaElement(videoElement);
-        this.flvPlayer.load();
-      }
-    });
+    this.initializeService.getViewerObservable().subscribe( streamUrl =>  this.initializeStream(streamUrl));
   }
 
   play(): void {
@@ -45,5 +33,21 @@ export class VideoPlayerComponent implements AfterViewInit {
 
   hideControlls() {
 
+  }
+
+  initializeStream(streamUrl: string) {
+    debugger;
+    try {
+      if (FlvJs.isSupported()) {
+        const videoElement = document.getElementById('videoElement') as HTMLMediaElement;
+        this.flvPlayer = FlvJs.createPlayer({
+          type: 'flv',
+          "isLive": true,
+          url: streamUrl
+        });
+        this.flvPlayer.attachMediaElement(videoElement);
+        this.flvPlayer.load();
+      }
+    } finally{}
   }
 }

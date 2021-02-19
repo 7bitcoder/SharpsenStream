@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using SharpsenStreamBackend.Classes;
 using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Resources;
 using System;
@@ -21,8 +22,10 @@ namespace SharpsenStreamBackend.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> login([FromRoute] string streamName, [FromBody] TokenDto token)
+        public async Task<ActionResult<User>> login([FromBody] UserCreditials creditials)
         {
+            var user = await _homeResource.Login(creditials.UserName, creditials.Password);
+            return Ok(user);
             var claims = new List<Claim>
             {
               new Claim(ClaimTypes.Name, Guid.NewGuid().ToString())

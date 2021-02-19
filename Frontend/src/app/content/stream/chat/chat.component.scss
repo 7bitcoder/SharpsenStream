@@ -11,18 +11,39 @@
     display: flex;
     flex-direction: column;
     background-color: $color-blue;
+    color: white !important;
     .chat {
+        margin: 5px;
         width: 100%;
         flex: 1 1 auto;
         display: flex;
         flex-direction: column;
+        .message {
+            display: flex;
+            flex-direction: row;
+        }
     }
     .input {
-        height: 80px;
-        width: 100%;
+        margin: 2% 5px;
+        width: 96%;
         &-raw{
-            width: 100%;
+            height: 50px;
+            width: 97%;
             resize: none;
+            background-color: $color-sky;
+            transition: background-color 0.5s ease;
+            border-radius: 5px;
+            color: white;
+            &:focus{
+                background-color: $color-night;
+            }
+        }
+        .controls {
+            display: flex;
+            flex-direction: row;
+            .spacer {
+                flex: 1 1 auto;
+            }
         }
     }
 }
