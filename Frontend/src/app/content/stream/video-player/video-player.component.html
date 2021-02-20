@@ -1,9 +1,11 @@
 <div class="video" (mouseenter)="showControlls()" (mouseleave)="hideControlls()">
     <video class="video-player" id="videoElement"></video>
 </div>
+<div hidden>
 <button mat-button (click)="play()">
   <span>Play</span>
 </button>
 <button mat-button (click)="pause()">
   <span>Pause</span>
 </button>
+</div>

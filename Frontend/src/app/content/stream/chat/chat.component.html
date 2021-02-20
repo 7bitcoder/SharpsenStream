@@ -1,8 +1,8 @@
 <div class="conteiner">
 
-    <div class="chat">
-        <span *ngFor="let message of messages" class="message">
-            <div [style.color]="message.color">
+    <div class="chat" #scrollframe (scroll)="scrolled($event)">
+        <span *ngFor="let message of messages; trackBy: trackByFn" class="message" #messages>
+            <div class="nickname" [style.color]="message.color">
                 {{message.userName}}:
             </div> &nbsp;{{message.message}}
         </span>

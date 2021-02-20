@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router} from '@angular/router';
 import { RouteNames } from 'src/app/route-names';
-import { InitializeService } from './services/initialize.service';
 import { StreamClient, StreamDto } from 'src/app/api/Api';
+import { PageNotFoundComponent } from '../page-not-found/page-not-found.component';
 
 @Component({
   selector: 'app-stream',
@@ -17,11 +17,10 @@ export class StreamComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private stream$: StreamClient,
-    private initializatior: InitializeService) { 
+    private stream$: StreamClient) { 
     const url = this.route.snapshot.url;
     if (url.length !== 1) {
-      this.router.navigate([RouteNames.notFound]);
+      this.notFound();
     }
     let streamName = url[0].toString();
     this.getStream(streamName);
@@ -35,17 +34,20 @@ export class StreamComponent implements OnInit {
   async getStream(name: string) {
     this.stream$.getStreamInfo(name).subscribe(
       {
-        next : res => {
-          this.streamInfo = res
+        next: res => {
           if (!res) {
-            this.router.navigate([RouteNames.notFound]);
+            this.notFound();
             return;
           }
-          this.initializatior.initializeChat(this.streamInfo.chatId);
-          this.initializatior.initializeViewer(this.streamInfo.streamName);
-        }
+          this.streamInfo = res
+        },
+        error: error => this.notFound()
       }
     );
+  }
+
+  notFound() {
+    this.router.navigate([RouteNames.notFound]);
   }
 
 }

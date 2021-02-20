@@ -1,7 +1,12 @@
+@import '../../assets/colors/colors.scss';
 
 
 :host {
     height: 100%;
     width: 100%;
     display: block;
+}
+.container {
+    height: 100%;
+    border-right: 1px solid $color-border;
 }

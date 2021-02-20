@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Resources;
+using System;
 using System.Threading.Tasks;
 
 namespace SharpsenStreamBackend.Controllers
@@ -19,7 +20,14 @@ namespace SharpsenStreamBackend.Controllers
         [HttpGet("{streamName}")]
         public async Task<ActionResult<StreamDto>> GetStreamInfo([FromRoute] string streamName)
         {
-            var stream = await _streamResource.getStream(streamName);
+            StreamDto stream = null;
+            try
+            {
+                stream = await _streamResource.getStream(streamName);
+            }
+            catch (Exception)
+            {
+            }
             return Ok(stream);
         }
     }

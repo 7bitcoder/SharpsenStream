@@ -23,6 +23,7 @@ import { PageNotFoundComponent } from './content/page-not-found/page-not-found.c
 import { HttpClientModule } from '@angular/common/http';
 import { VideoPlayerComponent } from './content/stream/video-player/video-player.component';
 import { API_BASE_URL } from './api/Api';
+import { StreamInfoComponent } from './content/stream/stream-info/stream-info.component';
 
 export function getBaseUrl(): string {
   return '/api';
@@ -38,7 +39,8 @@ export function getBaseUrl(): string {
     ContentComponent,
     StreamComponent,
     PageNotFoundComponent,
-    VideoPlayerComponent
+    VideoPlayerComponent,
+    StreamInfoComponent
   ],
   imports: [
     BrowserModule,

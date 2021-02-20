@@ -1,0 +1,53 @@
+@import 'src/assets/colors/colors.scss';
+
+:host {
+    width: 100%;
+    display: block;
+}
+.stream-info {
+    padding: 5px 10px;
+    height: 100px;
+    display: flex;
+    flex-direction: row;
+    .image {
+        height: 90px;
+        width: 90px;
+        margin: 5px;
+        background-color: greenyellow;
+    }
+    .informations {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        margin: 5px;
+        .spacer {
+            flex: 1 1 auto;
+        }
+        .first-row {
+            margin-top: 5px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .stream-name {
+                font-size: x-large;
+            }
+        }
+        .second-row {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .stream-title {
+            }
+            .stream-viewers {
+                margin: 0 5px;
+                color: $color-red;
+            }
+            .stream-uptime {
+                margin: 0 5px;
+                color: $color-blue;
+            }
+        }
+    }
+}
