@@ -1,4 +1,4 @@
-﻿namespace SharpsenStreamBackend.Classes.Dto
+﻿namespace SharpsenStreamBackend.Classes
 {
     public class User
     {

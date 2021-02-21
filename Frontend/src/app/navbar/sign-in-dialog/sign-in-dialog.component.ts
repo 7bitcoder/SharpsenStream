@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { UserService } from 'src/app/shared/user.service';
 
 
 export interface DialogData {
@@ -18,7 +19,8 @@ export class SignInDialogComponent implements OnInit {
   loginData = null
   constructor(
     private dialogRef: MatDialogRef<SignInDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {}
+    @Inject(MAT_DIALOG_DATA) data,
+    private user$: UserService) {}
 
   ngOnInit(): void {
     
@@ -29,7 +31,13 @@ export class SignInDialogComponent implements OnInit {
   }
 
   signIn(username: string, password: string) {
-    
+    this.user$.login(username, password).subscribe( result => {
+      debugger;
+      if( result ) {
+        const user = this.user$.getUser();
+        this.dialogRef.close(user);
+      }
+    })
   }
 
   createAccount(){

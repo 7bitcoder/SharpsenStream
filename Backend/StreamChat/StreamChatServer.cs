@@ -1,7 +1,9 @@
 ﻿
 
+using SharpsenStreamBackend.Classes;
 using SharpsenStreamBackend.Resources;
 using System;
+using System.Drawing;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ namespace SharpsenStreamBackend.StreamChat
 {
     public class StreamChatServer
     {
+        private readonly Random _random = new Random();
         ChatRooms _chatRooms;
         IUserResource _userResource;
         public StreamChatServer(ChatRooms chatRooms, IUserResource userResource)
@@ -23,7 +26,7 @@ namespace SharpsenStreamBackend.StreamChat
             {
                 var user = new ChatMember(webSocket);
                 var data = await waitForData(user);
-                var userData = await _userResource.getUser(data.userId);
+                var userData = await getUser(data.userId);
                 user.init(userData);
                 await _chatRooms.handleUser(user, data.chatId);
 
@@ -43,6 +46,27 @@ namespace SharpsenStreamBackend.StreamChat
             int chatId = Int32.Parse(id[0]);
             int userId = Int32.Parse(id[1]);
             return (chatId, userId);
+        }
+
+        private async Task<User> getUser(int id)
+        {
+            User user = null;
+            if (id > 0)
+            {
+                user = await _userResource.getUser(id);
+            }
+            else
+            {
+                user = new User
+                {
+                    Username = "anon" + _random.Next(1000, 9999),
+                    Color = Color.White.ToArgb(), // white 16777215
+                    AvatarFilePath = "/",
+                    Email = "",
+                    UserId = 0
+                };
+            }
+            return user;
         }
     }
 }

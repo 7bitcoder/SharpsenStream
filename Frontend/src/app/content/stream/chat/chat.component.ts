@@ -3,6 +3,7 @@ import { ChatService } from './chat.service';
 import { Message } from './message';
 import { MessageDisplay } from './message-display';
 import { StreamDto } from 'src/app/api/Api';
+import { UserService } from 'src/app/shared/user.service';
 
 
 @Component({
@@ -27,7 +28,8 @@ export class ChatComponent implements AfterViewInit {
   private isNearBottom = true;
   private scrollContainer: any;
 
-  constructor(private chat$: ChatService) { }
+  constructor(private chat$: ChatService,
+    private user$: UserService) { }
 
   ngOnInit(): void {
     this.initializeChat(this.streamInfo.chatId);
@@ -43,9 +45,10 @@ export class ChatComponent implements AfterViewInit {
   initializeChat(chatId: number) {
     if(!chatId)
       return;
+    const userId = this.user$.getUser()?.userId;
     this.chat$.connect();
     const msg: Message = {
-      message: `${chatId.toString()};1`,
+      message: `${chatId};${userId ?? 0}`,
       userName: 'me',
       color: 1
     }

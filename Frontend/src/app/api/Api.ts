@@ -17,7 +17,7 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 @Injectable({
     providedIn: 'root'
 })
-export class HomeClient {
+export class StreamClient {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -27,8 +27,60 @@ export class HomeClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
+    getStreamInfo(streamName: string | null): Observable<StreamDto> {
+        let url_ = this.baseUrl + "/Stream/{streamName}";
+        if (streamName === undefined || streamName === null)
+            throw new Error("The parameter 'streamName' must be defined.");
+        url_ = url_.replace("{streamName}", encodeURIComponent("" + streamName));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetStreamInfo(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetStreamInfo(<any>response_);
+                } catch (e) {
+                    return <Observable<StreamDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<StreamDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetStreamInfo(response: HttpResponseBase): Observable<StreamDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StreamDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<StreamDto>(<any>null);
+    }
+
     authenticateStream(streamName: string | null, token: TokenDto): Observable<FileResponse | null> {
-        let url_ = this.baseUrl + "/Home/authenticate/{streamName}";
+        let url_ = this.baseUrl + "/Stream/authenticate/{streamName}";
         if (streamName === undefined || streamName === null)
             throw new Error("The parameter 'streamName' must be defined.");
         url_ = url_.replace("{streamName}", encodeURIComponent("" + streamName));
@@ -40,6 +92,7 @@ export class HomeClient {
             body: content_,
             observe: "response",
             responseType: "blob",
+            withCredentials: true,
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
                 "Accept": "application/octet-stream"
@@ -84,7 +137,7 @@ export class HomeClient {
 @Injectable({
     providedIn: 'root'
 })
-export class StreamClient {
+export class UserClient {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -94,36 +147,38 @@ export class StreamClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getStreamInfo(streamName: string | null): Observable<StreamDto> {
-        let url_ = this.baseUrl + "/Stream/{streamName}";
-        if (streamName === undefined || streamName === null)
-            throw new Error("The parameter 'streamName' must be defined.");
-        url_ = url_.replace("{streamName}", encodeURIComponent("" + streamName));
+    login(creditials: UserCreditials): Observable<User> {
+        let url_ = this.baseUrl + "/User/Login";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(creditials);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",
+            withCredentials: true,
             headers: new HttpHeaders({
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetStreamInfo(response_);
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLogin(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetStreamInfo(<any>response_);
+                    return this.processLogin(<any>response_);
                 } catch (e) {
-                    return <Observable<StreamDto>><any>_observableThrow(e);
+                    return <Observable<User>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<StreamDto>><any>_observableThrow(response_);
+                return <Observable<User>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetStreamInfo(response: HttpResponseBase): Observable<StreamDto> {
+    protected processLogin(response: HttpResponseBase): Observable<User> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -133,7 +188,8 @@ export class StreamClient {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : <StreamDto>JSON.parse(_responseText, this.jsonParseReviver);
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = User.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -141,15 +197,163 @@ export class StreamClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<StreamDto>(<any>null);
+        return _observableOf<User>(<any>null);
+    }
+
+    logout(user: User): Observable<boolean> {
+        let url_ = this.baseUrl + "/User/Logout";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(user);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLogout(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLogout(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processLogout(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    get(): Observable<User> {
+        let url_ = this.baseUrl + "/User";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            withCredentials: true,
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<User>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<User>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<User> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = User.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<User>(<any>null);
     }
 }
 
-export interface TokenDto {
-    token?: string | undefined;
+export class StreamDto implements IStreamDto {
+    streamId!: number;
+    ownerId!: number;
+    streamName?: string | undefined;
+    live!: boolean;
+    title?: string | undefined;
+    description?: string | undefined;
+    chatId!: number;
+
+    constructor(data?: IStreamDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.streamId = _data["streamId"];
+            this.ownerId = _data["ownerId"];
+            this.streamName = _data["streamName"];
+            this.live = _data["live"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.chatId = _data["chatId"];
+        }
+    }
+
+    static fromJS(data: any): StreamDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StreamDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["streamId"] = this.streamId;
+        data["ownerId"] = this.ownerId;
+        data["streamName"] = this.streamName;
+        data["live"] = this.live;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["chatId"] = this.chatId;
+        return data; 
+    }
 }
 
-export interface StreamDto {
+export interface IStreamDto {
     streamId: number;
     ownerId: number;
     streamName?: string | undefined;
@@ -157,6 +361,134 @@ export interface StreamDto {
     title?: string | undefined;
     description?: string | undefined;
     chatId: number;
+}
+
+export class TokenDto implements ITokenDto {
+    token?: string | undefined;
+
+    constructor(data?: ITokenDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.token = _data["token"];
+        }
+    }
+
+    static fromJS(data: any): TokenDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TokenDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["token"] = this.token;
+        return data; 
+    }
+}
+
+export interface ITokenDto {
+    token?: string | undefined;
+}
+
+export class User implements IUser {
+    userId!: number;
+    username?: string | undefined;
+    email?: string | undefined;
+    avatarFilePath?: string | undefined;
+    color!: number;
+
+    constructor(data?: IUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.username = _data["username"];
+            this.email = _data["email"];
+            this.avatarFilePath = _data["avatarFilePath"];
+            this.color = _data["color"];
+        }
+    }
+
+    static fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["username"] = this.username;
+        data["email"] = this.email;
+        data["avatarFilePath"] = this.avatarFilePath;
+        data["color"] = this.color;
+        return data; 
+    }
+}
+
+export interface IUser {
+    userId: number;
+    username?: string | undefined;
+    email?: string | undefined;
+    avatarFilePath?: string | undefined;
+    color: number;
+}
+
+export class UserCreditials implements IUserCreditials {
+    userName?: string | undefined;
+    password?: string | undefined;
+
+    constructor(data?: IUserCreditials) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userName = _data["userName"];
+            this.password = _data["password"];
+        }
+    }
+
+    static fromJS(data: any): UserCreditials {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserCreditials();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userName"] = this.userName;
+        data["password"] = this.password;
+        return data; 
+    }
+}
+
+export interface IUserCreditials {
+    userName?: string | undefined;
+    password?: string | undefined;
 }
 
 export interface FileResponse {

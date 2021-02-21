@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { UserService } from 'src/app/shared/user.service';
+import { User } from '../api/Api';
 import { SignInDialogComponent } from './sign-in-dialog/sign-in-dialog.component';
 
 @Component({
@@ -9,11 +11,21 @@ import { SignInDialogComponent } from './sign-in-dialog/sign-in-dialog.component
 })
 export class NavbarComponent implements OnInit {
   loggedIn = false;
+  user: User;
   constructor(
-    public dialog: MatDialog) {}
+    public dialog: MatDialog, 
+    private user$: UserService) {}
 
 
   ngOnInit(): void {
+    this.user$.tryFetchUser().subscribe( succes => this.successLogin(succes))
+  }
+  
+  successLogin(succes: boolean): void {
+    if( succes ) {
+      this.user = this.user$.getUser();
+      this.loggedIn = true;
+    }
   }
 
   showLogInDialog() {
@@ -32,11 +44,12 @@ export class NavbarComponent implements OnInit {
   );
   }
 
-  analyzeData(data: any) {
+  analyzeData(data: User) {
+    debugger;
     if(!data) {
       this.loggedIn = false;
-      console.log("not logged");
     } else {
+      this.user = data;
       this.loggedIn = true;
     }
   }

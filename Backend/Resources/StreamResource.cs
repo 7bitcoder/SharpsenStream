@@ -27,5 +27,15 @@ namespace SharpsenStreamBackend.Resources
             var res = await _dbController.Querry<StreamDto>("dbo.GetStream", parameters);
             return res;
         }
+
+
+        public async Task<bool> authenticate(string streamName, string token)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@StreamName", streamName, DbType.String);
+            parameters.Add("@Token", token, DbType.String);
+            var res = await _dbController.Querry("dbo.AuthenticateStreamInit", parameters);
+            return res == 1;
+        }
     }
 }

@@ -49,3 +49,28 @@ BEGIN
    SELECT TOP 1 UserId, Username, Email, AvatarFilePath, Color FROM Users
 		WHERE UserId = @Id
 END
+
+
+GO
+CREATE PROCEDURE GetNewToken @UserId int, @OldToken varchar(256) = NULL, @ExpireDays int = 365
+AS
+BEGIN
+
+IF ( @OldToken IS NOT NULL)
+BEGIN
+	EXEC DeleteToken @UserId, @OldToken
+END
+
+DECLARE @myid uniqueidentifier  
+SET @myid = NEWID() 
+INSERT INTO UserTokens (OwnerId, Token, Expiration)
+ OUTPUT INSERTED .*
+VALUES (@UserId,CONVERT(varchar(256), @myid), DATEADD(Day, @ExpireDays, GETDATE()))
+END
+
+GO
+CREATE PROCEDURE DeleteToken @UserId int, @Token varchar(256)
+AS
+BEGIN
+DELETE FROM UserTokens WHERE OwnerId = @UserId AND (Expiration < GETDATE() OR @Token = Token)
+END

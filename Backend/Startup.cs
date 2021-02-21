@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SharpsenStreamBackend.Database;
 using SharpsenStreamBackend.Resources;
 using SharpsenStreamBackend.StreamChat;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SharpsenStreamBackend
@@ -41,20 +45,19 @@ namespace SharpsenStreamBackend
             });
             services.AddSingleton<DbController>();
             services.AddSingleton<IStreamResource, StreamResource>();
-            services.AddSingleton<IHomeResource, HomeResource>();
             services.AddSingleton<IUserResource, UserResource>();
+
             services.AddSingleton<ChatRooms>();
             services.AddSingleton<StreamChatServer>();
-            /*services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
               .AddCookie(options =>
               {
-                  options.Cookie.HttpOnly = true;
+                  options.Cookie.HttpOnly = false;
                   options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                  options.Cookie.SameSite = SameSiteMode.Lax;
-                  options.Cookie.Name = "SimpleTalk.AuthCookieAspNetCore";
-                  options.LoginPath = "/Home/Login";
-                  options.LogoutPath = "/Home/Logout";
-              });*/
+                  options.Cookie.SameSite = SameSiteMode.None;
+                  options.Cookie.Name = "SharpsenStreamCookie";
+              });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,17 +69,26 @@ namespace SharpsenStreamBackend
                 app.UseDeveloperExceptionPage();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SharpsenStreamBackend v1"));
             }
+
+            app.UseFileServer(new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                Path.Combine(env.ContentRootPath, "ServerFiles")),
+                RequestPath = "/ServerFiles",
+                EnableDirectoryBrowsing = true
+            });
+
             app.UseWebSockets();
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            // app.UseAuthorization();
+            app.UseCookiePolicy();
 
-            //app.UseCookiePolicy();
+            app.UseAuthentication();
 
-            //app.UseAuthentication();
+            app.UseAuthorization();
 
             app.Use(async (context, next) =>
             {

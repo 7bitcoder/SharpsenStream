@@ -7,11 +7,11 @@
     <div *ngIf="loggedIn; else signIn">
         <button mat-icon-button class="example-icon" [matMenuTriggerFor]="menu" aria-label="Example icon-button with share icon">
             <div class="avatarContainer">
-                <img class="avatarImg" [src]="getavatarPath()">
+                <img class="avatarImg" [src]="user.avatarFilePath">
             </div>
         </button>
     </div>
-    <ng-template #signIn>
+    <ng-template #signIn >
         <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with heart icon">
             <mat-icon svgIcon="LogIn"></mat-icon>
         </button>

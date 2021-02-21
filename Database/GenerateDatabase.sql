@@ -2,7 +2,7 @@ CREATE DATABASE SharpsenStream
 USE SharpsenStream
 
 CREATE TABLE Users (
-    UserId int,
+    UserId int IDENTITY(1,1) PRIMARY KEY,
     Username varchar(256),
     UserPassword varchar(256),
     Email varchar(256),
@@ -17,7 +17,7 @@ CREATE TABLE Perms (
 );
 
 CREATE TABLE Stream (
-    StreamId int,
+    StreamId int IDENTITY(1,1) PRIMARY KEY,
 	OwnerId int,
 	StreamName varchar(256),
 	Live bit,
@@ -25,4 +25,11 @@ CREATE TABLE Stream (
 	Description varchar(256),
 	ChatId int,
 	Token varchar(256)
+);
+
+CREATE TABLE UserTokens (
+    TokenId int IDENTITY(1,1) PRIMARY KEY,
+	OwnerId int,
+	Token varchar(256),
+	Expiration Date
 );
