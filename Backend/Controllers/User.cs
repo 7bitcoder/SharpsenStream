@@ -14,7 +14,6 @@ namespace SharpsenStreamBackend.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
     public class User : Controller
     {
         private IUserResource _userResource;
@@ -24,7 +23,6 @@ namespace SharpsenStreamBackend.Controllers
         }
 
         [HttpPost("Login")]
-        [AllowAnonymous]
         public async Task<ActionResult<Classes.User>> login([FromBody] UserCreditials creditials)
         {
             var user = await _userResource.Login(creditials.UserName, creditials.Password);

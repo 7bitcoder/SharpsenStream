@@ -8,7 +8,7 @@ import { ServerConfig } from './server-config';
   providedIn: 'root'
 })
 export class ChatService {
-  StreamUrl = '/api/Stream';
+  StreamUrl = 'https://localhost:5001/Stream';
   private socket$: WebSocketSubject<Message>;
    
   public connect(): void {

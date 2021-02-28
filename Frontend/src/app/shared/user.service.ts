@@ -41,13 +41,11 @@ export class UserService {
   getUser(): User { return this.user; }
 
   private handleError(error: any): Observable<User> {
-    debugger;
     this.isLoggedIn = false
     return of(null);
   }
 
   private mapResult(user: User): boolean {
-    debugger;
     if( !!user ) {
       this.user = user;
       this.isLoggedIn = true;

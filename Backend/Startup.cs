@@ -25,6 +25,7 @@ namespace SharpsenStreamBackend
 
         public IConfiguration Configuration { get; }
 
+        readonly string corsName = "WebApiCors";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -37,11 +38,11 @@ namespace SharpsenStreamBackend
             services.AddSwaggerDocument();
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(
-                                builder =>
-                                {
-                                    builder.WithOrigins(@"http://localhost:4200/blogwow");
-                                });
+                options.AddPolicy(corsName,
+                        builder => {
+                            builder.WithOrigins("http://localhost:4200", "https://localhost:4200");
+                            builder.AllowCredentials();
+                        });
             });
             services.AddSingleton<DbController>();
             services.AddSingleton<IStreamResource, StreamResource>();
@@ -50,14 +51,14 @@ namespace SharpsenStreamBackend
             services.AddSingleton<ChatRooms>();
             services.AddSingleton<StreamChatServer>();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            /*services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
               .AddCookie(options =>
               {
                   options.Cookie.HttpOnly = false;
                   options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                   options.Cookie.SameSite = SameSiteMode.None;
                   options.Cookie.Name = "SharpsenStreamCookie";
-              });
+              });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,11 +85,13 @@ namespace SharpsenStreamBackend
 
             app.UseRouting();
 
+            app.UseCors(corsName);
+
             app.UseCookiePolicy();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.Use(async (context, next) =>
             {

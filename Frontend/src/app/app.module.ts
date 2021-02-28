@@ -26,7 +26,7 @@ import { API_BASE_URL } from './api/Api';
 import { StreamInfoComponent } from './content/stream/stream-info/stream-info.component';
 
 export function getBaseUrl(): string {
-  return '/api';
+  return 'https://localhost:5001';
 }
 @NgModule({
   declarations: [
