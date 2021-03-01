@@ -1,4 +1,6 @@
-﻿namespace SharpsenStreamBackend.Classes.Dto
+﻿using System;
+
+namespace SharpsenStreamBackend.Classes.Dto
 {
     public class StreamDto
     {
@@ -9,5 +11,7 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public int ChatId { get; set; }
+        public DateTime StartTime { get; set; }
+        public int Viewers { get; set; } = 0;
     }
 }

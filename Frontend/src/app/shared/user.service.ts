@@ -42,6 +42,7 @@ export class UserService {
 
   private handleError(error: any): Observable<User> {
     this.isLoggedIn = false
+    console.log(error);
     return of(null);
   }
 

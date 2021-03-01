@@ -14,7 +14,7 @@ const config = {
     port: 8000,
     allow_origin: '*'
   },
-  apiUrl: 'https://localhost:5001/Stream/authenticate'
+  apiUrl: 'https://localhost:5001/Stream/start'
 };
 
 var nms = new NodeMediaServer(config)

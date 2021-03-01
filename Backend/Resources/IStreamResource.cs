@@ -8,6 +8,8 @@ namespace SharpsenStreamBackend.Resources
     {
         Task<StreamDto> getStream(string streamName);
         Task<bool> authenticate(string streamName, string token);
+        Task startStream(string streamName);
+        Task endStream(string streamName);
         Task<IEnumerable<ChatRoomId>> getChatRooms();
     }
 }

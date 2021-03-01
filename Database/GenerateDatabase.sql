@@ -24,12 +24,24 @@ CREATE TABLE Stream (
 	Title varchar(256),
 	Description varchar(256),
 	ChatId int,
-	Token varchar(256)
+	Token varchar(256),
+	StartTime datetime
 );
 
 CREATE TABLE UserTokens (
     TokenId int IDENTITY(1,1) PRIMARY KEY,
 	OwnerId int,
 	Token varchar(256),
-	Expiration Date
+	Expiration datetime
+);
+
+CREATE TABLE StreamsHistory (
+    StreamId int,
+	OwnerId int,
+	StreamName varchar(256),
+	Title varchar(256),
+	Description varchar(256),
+	Token varchar(256),
+	StartTime datetime,
+	EndTime datetime
 );

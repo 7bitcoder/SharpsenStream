@@ -32,7 +32,6 @@ export class SignInDialogComponent implements OnInit {
 
   signIn(username: string, password: string) {
     this.user$.login(username, password).subscribe( result => {
-      debugger;
       if( result ) {
         const user = this.user$.getUser();
         this.dialogRef.close(user);

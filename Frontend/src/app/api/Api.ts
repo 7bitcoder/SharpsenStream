@@ -79,8 +79,8 @@ export class StreamClient {
         return _observableOf<StreamDto>(<any>null);
     }
 
-    authenticateStream(streamName: string | null, token: TokenDto): Observable<FileResponse | null> {
-        let url_ = this.baseUrl + "/Stream/authenticate/{streamName}";
+    startStream(streamName: string | null, token: TokenDto): Observable<FileResponse | null> {
+        let url_ = this.baseUrl + "/Stream/start/{streamName}";
         if (streamName === undefined || streamName === null)
             throw new Error("The parameter 'streamName' must be defined.");
         url_ = url_.replace("{streamName}", encodeURIComponent("" + streamName));
@@ -100,11 +100,11 @@ export class StreamClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAuthenticateStream(response_);
+            return this.processStartStream(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAuthenticateStream(<any>response_);
+                    return this.processStartStream(<any>response_);
                 } catch (e) {
                     return <Observable<FileResponse | null>><any>_observableThrow(e);
                 }
@@ -113,7 +113,7 @@ export class StreamClient {
         }));
     }
 
-    protected processAuthenticateStream(response: HttpResponseBase): Observable<FileResponse | null> {
+    protected processStartStream(response: HttpResponseBase): Observable<FileResponse | null> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -311,6 +311,8 @@ export class StreamDto implements IStreamDto {
     title?: string | undefined;
     description?: string | undefined;
     chatId!: number;
+    startTime!: Date;
+    viewers!: number;
 
     constructor(data?: IStreamDto) {
         if (data) {
@@ -330,6 +332,8 @@ export class StreamDto implements IStreamDto {
             this.title = _data["title"];
             this.description = _data["description"];
             this.chatId = _data["chatId"];
+            this.startTime = _data["startTime"] ? new Date(_data["startTime"].toString()) : <any>undefined;
+            this.viewers = _data["viewers"];
         }
     }
 
@@ -349,6 +353,8 @@ export class StreamDto implements IStreamDto {
         data["title"] = this.title;
         data["description"] = this.description;
         data["chatId"] = this.chatId;
+        data["startTime"] = this.startTime ? this.startTime.toISOString() : <any>undefined;
+        data["viewers"] = this.viewers;
         return data; 
     }
 }
@@ -361,6 +367,8 @@ export interface IStreamDto {
     title?: string | undefined;
     description?: string | undefined;
     chatId: number;
+    startTime: Date;
+    viewers: number;
 }
 
 export class TokenDto implements ITokenDto {

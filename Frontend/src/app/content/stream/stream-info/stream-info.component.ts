@@ -28,7 +28,8 @@ export class StreamInfoComponent implements OnInit, OnDestroy {
     this.streamName = this.streamInfo.streamName;
     this.streamTitle = this.streamInfo.title;
     this.viewers = '1203';
-    this.streamUptime = 20000;
+    let secDiff = Math.floor( ( Date.now() - this.streamInfo.startTime.getTime()) / 1000 );
+    this.streamUptime = secDiff;
     this.initTimeUpdater();
   }
 
