@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using SharpsenStreamBackend.Classes;
 using SharpsenStreamBackend.Database;
+using SharpsenStreamBackend.Resources.Interfaces;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;

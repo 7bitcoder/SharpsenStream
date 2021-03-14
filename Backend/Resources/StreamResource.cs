@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Database;
+using SharpsenStreamBackend.Resources.Interfaces;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using SharpsenStreamBackend.Classes.Dto;
+using SharpsenStreamBackend.Resources;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -11,27 +12,23 @@ namespace SharpsenStreamBackend.Database
 {
     public class DbController
     {
-        private DbSettings _dbSettings;
-        private SqlConnectionStringBuilder _builder;
         private string _connectionStr;
 
-        public DbController()
+        public DbController(Config config)
         {
-            using StreamReader file = File.OpenText(@"dbSettings.json");
-            _dbSettings = JsonSerializer.Deserialize<DbSettings>(file.ReadToEnd());
-            buildConnectionString();
+            buildConnectionString(config);
         }
 
-        private void buildConnectionString()
+        private void buildConnectionString(Config config)
         {
-            _builder = new SqlConnectionStringBuilder()
+            var builder = new SqlConnectionStringBuilder()
             {
-                DataSource = _dbSettings.Machiene,
-                InitialCatalog = _dbSettings.DatabaseName,
-                UserID = $@"{_dbSettings.Machiene}/{_dbSettings.User}",
+                DataSource = config.config.database.Machiene,
+                InitialCatalog = config.config.database.DatabaseName,
+                UserID = $@"{config.config.database.Machiene}/{config.config.database.User}",
                 IntegratedSecurity = true
             };
-            _connectionStr = _builder.ConnectionString;
+            _connectionStr = builder.ConnectionString;
         }
 
         public async Task<int?> Querry(string procedure, DynamicParameters parameters)

@@ -2,6 +2,7 @@
 
 using SharpsenStreamBackend.Classes;
 using SharpsenStreamBackend.Resources;
+using SharpsenStreamBackend.Resources.Interfaces;
 using System;
 using System.Drawing;
 using System.Net.WebSockets;

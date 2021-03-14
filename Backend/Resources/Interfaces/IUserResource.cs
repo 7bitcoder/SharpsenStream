@@ -1,8 +1,7 @@
 ﻿using SharpsenStreamBackend.Classes;
-using SharpsenStreamBackend.Classes.Dto;
 using System.Threading.Tasks;
 
-namespace SharpsenStreamBackend.Resources
+namespace SharpsenStreamBackend.Resources.Interfaces
 {
     public interface IUserResource
     {

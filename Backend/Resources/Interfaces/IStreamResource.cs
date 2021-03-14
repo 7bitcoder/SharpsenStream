@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SharpsenStreamBackend.Resources
+namespace SharpsenStreamBackend.Resources.Interfaces
 {
     public interface IStreamResource
     {

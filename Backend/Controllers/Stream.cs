@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Resources;
+using SharpsenStreamBackend.Resources.Interfaces;
 using System;
 using System.Threading.Tasks;
 

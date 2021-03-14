@@ -1,5 +1,6 @@
 ﻿using SharpsenStreamBackend.Classes.Dto;
 using SharpsenStreamBackend.Resources;
+using SharpsenStreamBackend.Resources.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
