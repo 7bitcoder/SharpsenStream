@@ -30,7 +30,7 @@ namespace SharpsenStreamBackend.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
-        public async Task<ActionResult<Classes.User>> login([FromBody] UserCreditials creditials)
+        public async Task<ActionResult<LoginResult>> login([FromBody] UserCreditials creditials)
         {
             var user = await _userResource.Login(creditials.UserName, creditials.Password);
 
@@ -41,9 +41,10 @@ namespace SharpsenStreamBackend.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.Name, creditials.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
             };
 
-            var jwtResult = _jwtAuthManager.GenerateTokens(creditials.UserName, claims, DateTime.Now);
+            var jwtResult = _jwtAuthManager.GenerateTokens(user.UserId, creditials.UserName, claims, DateTime.Now);
             
             return Ok(new LoginResult
             {
@@ -57,7 +58,7 @@ namespace SharpsenStreamBackend.Controllers
             });
         }
 
-        [HttpPost("Logout")]
+                [HttpPost("Logout")]
         public async Task<ActionResult<bool>> logout([FromBody] Classes.User user)
         {
             var guid = HttpContext.User.Claims.Where(claim => claim.Type == ClaimTypes.Authentication).Select(claim => claim.Value).FirstOrDefault();

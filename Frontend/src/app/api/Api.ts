@@ -147,7 +147,7 @@ export class UserClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    login(creditials: UserCreditials): Observable<User> {
+    login(creditials: UserCreditials): Observable<LoginResult> {
         let url_ = this.baseUrl + "/User/Login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -171,14 +171,14 @@ export class UserClient {
                 try {
                     return this.processLogin(<any>response_);
                 } catch (e) {
-                    return <Observable<User>><any>_observableThrow(e);
+                    return <Observable<LoginResult>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<User>><any>_observableThrow(response_);
+                return <Observable<LoginResult>><any>_observableThrow(response_);
         }));
     }
 
-    protected processLogin(response: HttpResponseBase): Observable<User> {
+    protected processLogin(response: HttpResponseBase): Observable<LoginResult> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -189,7 +189,7 @@ export class UserClient {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = User.fromJS(resultData200);
+            result200 = LoginResult.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -197,7 +197,7 @@ export class UserClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<User>(<any>null);
+        return _observableOf<LoginResult>(<any>null);
     }
 
     logout(user: User): Observable<boolean> {
@@ -407,6 +407,106 @@ export interface ITokenDto {
     token?: string | undefined;
 }
 
+export class LoginResult implements ILoginResult {
+    userId!: number;
+    username?: string | undefined;
+    email?: string | undefined;
+    avatarFilePath?: string | undefined;
+    color!: number;
+    accessToken?: string | undefined;
+    refreshToken?: string | undefined;
+
+    constructor(data?: ILoginResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userId = _data["userId"];
+            this.username = _data["username"];
+            this.email = _data["email"];
+            this.avatarFilePath = _data["avatarFilePath"];
+            this.color = _data["color"];
+            this.accessToken = _data["accessToken"];
+            this.refreshToken = _data["refreshToken"];
+        }
+    }
+
+    static fromJS(data: any): LoginResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new LoginResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userId"] = this.userId;
+        data["username"] = this.username;
+        data["email"] = this.email;
+        data["avatarFilePath"] = this.avatarFilePath;
+        data["color"] = this.color;
+        data["accessToken"] = this.accessToken;
+        data["refreshToken"] = this.refreshToken;
+        return data; 
+    }
+}
+
+export interface ILoginResult {
+    userId: number;
+    username?: string | undefined;
+    email?: string | undefined;
+    avatarFilePath?: string | undefined;
+    color: number;
+    accessToken?: string | undefined;
+    refreshToken?: string | undefined;
+}
+
+export class UserCreditials implements IUserCreditials {
+    userName?: string | undefined;
+    password?: string | undefined;
+
+    constructor(data?: IUserCreditials) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.userName = _data["userName"];
+            this.password = _data["password"];
+        }
+    }
+
+    static fromJS(data: any): UserCreditials {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserCreditials();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["userName"] = this.userName;
+        data["password"] = this.password;
+        return data; 
+    }
+}
+
+export interface IUserCreditials {
+    userName?: string | undefined;
+    password?: string | undefined;
+}
+
 export class User implements IUser {
     userId!: number;
     username?: string | undefined;
@@ -457,46 +557,6 @@ export interface IUser {
     email?: string | undefined;
     avatarFilePath?: string | undefined;
     color: number;
-}
-
-export class UserCreditials implements IUserCreditials {
-    userName?: string | undefined;
-    password?: string | undefined;
-
-    constructor(data?: IUserCreditials) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.userName = _data["userName"];
-            this.password = _data["password"];
-        }
-    }
-
-    static fromJS(data: any): UserCreditials {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserCreditials();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["userName"] = this.userName;
-        data["password"] = this.password;
-        return data; 
-    }
-}
-
-export interface IUserCreditials {
-    userName?: string | undefined;
-    password?: string | undefined;
 }
 
 export interface FileResponse {

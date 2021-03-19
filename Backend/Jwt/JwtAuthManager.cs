@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using SharpsenStreamBackend.Resources;
+using SharpsenStreamBackend.Resources.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,38 +16,28 @@ namespace SharpsenStreamBackend.Jwt
 {
     public class JwtAuthManager : IJwtAuthManager
     {
-        public IImmutableDictionary<string, RefreshToken> UsersRefreshTokensReadOnlyDictionary => _usersRefreshTokens.ToImmutableDictionary();
-        private readonly ConcurrentDictionary<string, RefreshToken> _usersRefreshTokens;  // can store in a database or a distributed cache
         private readonly SharpsenStreamBackend.Classes.Jwt _jwtTokenConfig;
         private readonly byte[] _secret;
+        private IUserResource _userResource;
 
-        public JwtAuthManager(Config config)
+        public JwtAuthManager(Config config, IUserResource userResource)
         {
+            _userResource = userResource;
             _jwtTokenConfig = config.config.jwt;
-            _usersRefreshTokens = new ConcurrentDictionary<string, RefreshToken>();
             _secret = Encoding.ASCII.GetBytes(_jwtTokenConfig.Secret);
         }
 
         public void RemoveExpiredRefreshTokens(DateTime now)
         {
-            var expiredTokens = _usersRefreshTokens.Where(x => x.Value.ExpireAt < now).ToList();
-            foreach (var expiredToken in expiredTokens)
-            {
-                _usersRefreshTokens.TryRemove(expiredToken.Key, out _);
-            }
         }
 
         // can be more specific to ip, user agent, device name, etc.
         public void RemoveRefreshTokenByUserName(string userName)
         {
-            var refreshTokens = _usersRefreshTokens.Where(x => x.Value.UserName == userName).ToList();
-            foreach (var refreshToken in refreshTokens)
-            {
-                _usersRefreshTokens.TryRemove(refreshToken.Key, out _);
-            }
+            
         }
 
-        public JwtAuthResult GenerateTokens(string username, Claim[] claims, DateTime now)
+        public JwtAuthResult GenerateTokens(int userId, string username, Claim[] claims, DateTime now)
         {
             var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
             var jwtToken = new JwtSecurityToken(
@@ -63,7 +54,8 @@ namespace SharpsenStreamBackend.Jwt
                 TokenString = GenerateRefreshTokenString(),
                 ExpireAt = now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration)
             };
-            _usersRefreshTokens.AddOrUpdate(refreshToken.TokenString, refreshToken, (_, _) => refreshToken);
+            _userResource.setRefreshToken(userId, refreshToken.TokenString, refreshToken.ExpireAt);
+            _userResource.setToken(userId, accessToken, now.AddMinutes(_jwtTokenConfig.AccessTokenExpiration));
 
             return new JwtAuthResult
             {
@@ -80,7 +72,7 @@ namespace SharpsenStreamBackend.Jwt
                 throw new SecurityTokenException("Invalid token");
             }
 
-            var userName = principal.Identity?.Name;
+            /*var userName = principal.Identity?.Name;
             if (!_usersRefreshTokens.TryGetValue(refreshToken, out var existingRefreshToken))
             {
                 throw new SecurityTokenException("Invalid token");
@@ -88,9 +80,9 @@ namespace SharpsenStreamBackend.Jwt
             if (existingRefreshToken.UserName != userName || existingRefreshToken.ExpireAt < now)
             {
                 throw new SecurityTokenException("Invalid token");
-            }
+            }*/
 
-            return GenerateTokens(userName, principal.Claims.ToArray(), now); // need to recover the original claims
+            return GenerateTokens(1, "", principal.Claims.ToArray(), now); // need to recover the original claims
         }
 
         public (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token)

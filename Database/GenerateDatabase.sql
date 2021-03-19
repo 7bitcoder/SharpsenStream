@@ -32,7 +32,8 @@ CREATE TABLE UserTokens (
     TokenId int IDENTITY(1,1) PRIMARY KEY,
 	OwnerId int,
 	Token varchar(256),
-	Expiration datetime
+	Expiration datetime,
+	Refresh bit
 );
 
 CREATE TABLE StreamsHistory (

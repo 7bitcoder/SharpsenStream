@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { User, UserClient, UserCreditials } from '../api/Api';
+import { LoginResult, User, UserClient, UserCreditials } from '../api/Api';
 
 @Injectable({
   providedIn: 'root'
@@ -40,15 +40,17 @@ export class UserService {
   isLogged(): boolean { return this.isLoggedIn; }
   getUser(): User { return this.user; }
 
-  private handleError(error: any): Observable<User> {
+  private handleError(error: any): Observable<LoginResult> {
     this.isLoggedIn = false
     console.log(error);
     return of(null);
   }
 
-  private mapResult(user: User): boolean {
-    if( !!user ) {
-      this.user = user;
+  private mapResult(loginResult: LoginResult): boolean {
+    if( !!loginResult ) {
+      this.user = loginResult;
+      localStorage.setItem('token', loginResult.accessToken);
+      localStorage.setItem('refresh-token', loginResult.refreshToken);
       this.isLoggedIn = true;
     } else {
       this.isLoggedIn = false;

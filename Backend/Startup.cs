@@ -49,6 +49,7 @@ namespace SharpsenStreamBackend
                         builder => {
                             builder.WithOrigins("http://localhost:4200", "https://localhost:4200");
                             builder.AllowCredentials();
+                            builder.AllowAnyHeader();
                         });
             });
             services.AddSingleton<DbController>();

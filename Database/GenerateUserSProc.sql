@@ -25,21 +25,14 @@ BEGIN
 END
 /* ==================================================================== */
 GO
-CREATE PROCEDURE GetNewToken @UserId int, @OldToken varchar(256) = NULL, @ExpireDays int = 365
+CREATE PROCEDURE SetToken @UserId int, @Token varchar(256), @Expire DateTime, @Refresh bit
 AS
 BEGIN
 
-IF ( @OldToken IS NOT NULL)
-BEGIN
-	EXEC DeleteToken @UserId, @OldToken
+INSERT INTO UserTokens (OwnerId, Token, Expiration, Refresh)
+	VALUES (@UserId, @Token, @Expire, @Refresh)
 END
-/* ==================================================================== */
-DECLARE @myid uniqueidentifier  
-SET @myid = NEWID() 
-INSERT INTO UserTokens (OwnerId, Token, Expiration)
- OUTPUT INSERTED .*
-VALUES (@UserId,CONVERT(varchar(256), @myid), DATEADD(Day, @ExpireDays, GETDATE()))
-END
+
 /* ==================================================================== */
 GO
 CREATE PROCEDURE DeleteToken @UserId int, @Token varchar(256)

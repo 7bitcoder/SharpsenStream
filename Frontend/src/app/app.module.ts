@@ -24,6 +24,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { VideoPlayerComponent } from './content/stream/video-player/video-player.component';
 import { API_BASE_URL } from './api/Api';
 import { StreamInfoComponent } from './content/stream/stream-info/stream-info.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TokenInterceptor } from './shared/token-inceptor';
 
 export function getBaseUrl(): string {
   return 'https://localhost:5001';
@@ -56,7 +58,11 @@ export function getBaseUrl(): string {
     MatFormFieldModule,
     HttpClientModule
   ],
-  providers: [{ provide: API_BASE_URL, useFactory: getBaseUrl }],
+  providers: [
+    { provide: API_BASE_URL, useFactory: getBaseUrl },
+    HttpClientModule,
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
