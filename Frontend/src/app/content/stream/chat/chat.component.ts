@@ -21,7 +21,7 @@ export class ChatComponent implements AfterViewInit {
     return {
       id: this.messagesId++,
       color: 'white',
-      message: "nygger" + this.messagesId,
+      message: "example" + this.messagesId,
       userName: "monke"
     }
   })  ;

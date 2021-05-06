@@ -21,7 +21,7 @@ namespace SharpsenStreamBackend.Resources
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Id", id, DbType.Int32);
-            return this._dbController.Querry<User>("dbo.GetUser", parameters);
+            return _dbController.Querry<User>("dbo.GetUser", parameters);
         }
 
         public Task<User> Login(string userName, string password)
@@ -61,33 +61,32 @@ namespace SharpsenStreamBackend.Resources
             return sBuilder.ToString();
         }
 
-        public async Task deleteToken(int userId, string token)
+        public Task deleteToken(int userId, string token)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@UserId", userId, DbType.Int32);
             parameters.Add("@Token", token, DbType.String);
-            await _dbController.Querry("dbo.DeleteToken", parameters);
-            return;
+            return _dbController.Run("dbo.DeleteToken", parameters);
         }
 
-        public async Task setToken(int id, string token, DateTime expiration)
+        public Task setToken(int id, string token, DateTime expiration)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@UserId", id, DbType.Int32);
             parameters.Add("@Token", token, DbType.String);
             parameters.Add("@Expire", expiration, DbType.DateTime);
             parameters.Add("@Refresh", 0, DbType.Binary);
-            await _dbController.Querry("dbo.SetToken", parameters);
+            return _dbController.Run("dbo.SetToken", parameters);
         }
 
-        public async Task setRefreshToken(int id, string token, DateTime expiration)
+        public Task setRefreshToken(int id, string token, DateTime expiration)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@UserId", id, DbType.Int32);
             parameters.Add("@Token", token, DbType.String);
             parameters.Add("@Expire", expiration, DbType.DateTime);
             parameters.Add("@Refresh", 1, DbType.Binary);
-            await _dbController.Querry("dbo.SetToken", parameters);
+            return _dbController.Run("dbo.SetToken", parameters);
         }
     }
 }

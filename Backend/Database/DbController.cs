@@ -31,6 +31,13 @@ namespace SharpsenStreamBackend.Database
             _connectionStr = builder.ConnectionString;
         }
 
+        public async Task Run(string procedure, DynamicParameters parameters)
+        {
+            using (IDbConnection connection = new SqlConnection(_connectionStr))
+            {
+                await connection.ExecuteAsync(procedure, parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
         public async Task<int?> Querry(string procedure, DynamicParameters parameters)
         {
             using (IDbConnection connection = new SqlConnection(_connectionStr))
